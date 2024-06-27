@@ -1,0 +1,52 @@
+hostname HS-Corner-Canyon-Stadium-180
+
+vlan 1
+exit
+
+vlan 40
+exit
+
+vlan 56
+description A/V
+exit
+
+vlan 100
+description AppleTV
+exit
+
+vlan 110
+description PressBOX
+exit
+
+vlan 200
+exit
+
+vlan 240
+exit
+
+vlan 250
+exit
+
+interface vlan 1
+ip address 10.230.24.180/16
+exit
+
+ip route 0.0.0.0/0 10.230.0.1
+exit
+
+interface 1/1/1-1/1/48,2/1/1-2/1/24
+no shutdown
+no routing
+vlan trunk native 1
+vlan trunk allow 1,40,100,200,240
+
+interface 1/1/19,1/1/21,1/1/23,1/1/25,1/1/29,1/1/31,1/1/33
+vlan access 110
+
+interface 1/1/26
+vlan access 100
+
+interface 1/1/48
+vlan access 250
+
+write mem

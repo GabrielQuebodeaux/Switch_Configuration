@@ -1,0 +1,808 @@
+#
+ version 5.20 Release 2221P08-US, Release 2221P08-US
+#
+ sysname HS_Corner-Canyon_Stadium_180
+#
+ clock timezone "Mountain Time(US,Canada)" minus 07:00:00
+ clock summer-time summer-time repeating 02:00:00 2000 March second Sunday 02:00:00 2000 November first Sunday  01:00:00
+#
+ voice vlan mac-address 0004-f200-0000 mask ffff-ff00-0000
+ voice vlan mac-address 0416-7f00-0000 mask ffff-ff00-0000
+ voice vlan track lldp
+#
+ irf mac-address persistent timer
+ irf auto-update enable
+ undo irf link-delay
+#
+ domain default enable system
+#
+ lldp compliance cdp
+#
+ undo cluster enable
+#
+ password-recovery enable
+#
+acl number 2000
+ description Switch Management
+ rule 0 permit source 10.25.0.0 0.0.255.255
+ rule 7 permit source 10.24.7.0 0.0.0.255
+ rule 25 permit source 10.24.25.0 0.0.0.255
+ rule 47 permit source 10.24.47.0 0.0.0.255
+ rule 58 permit source 10.24.58.0 0.0.0.255
+ rule 60 permit source 10.24.60.0 0.0.0.255
+#
+igmp-snooping
+#
+vlan 1
+ igmp-snooping enable
+#
+vlan 40
+#
+vlan 56
+ description A/V
+#
+vlan 100
+ description AppleTV
+#
+vlan 110
+ description PressBOX
+#
+vlan 200
+#
+vlan 240
+#
+vlan 250
+#
+hwtacacs scheme tacacs
+ primary authentication 10.24.49.1 key cipher $c$3$RUAWbnishcpzK47Rq7OltQBQoU1Ltx95Ms0DPwE44SGU8qHckbbmyOz1Wg==
+ secondary authentication 10.24.58.2 key cipher $c$3$xN10notL5qeYUe/mKRM7BE7VpGHH5sGMeh6lG+hVKOdlvWY=
+ primary authorization 10.24.49.1 key cipher $c$3$RBYVsPENzh2qYuBLG+w/0meseiqaZUTQ7Kpki79jCCidK6qDRsoSS6Hzhg==
+ secondary authorization 10.24.58.2 key cipher $c$3$qjJV6zn/5/pRNdUeg+D4HR35wSh9RXZ2kGOO5RzF/Tl46D4=
+ primary accounting 10.24.49.1 key cipher $c$3$Mq3RgfnDYl2d/bCYhAKe2GbEg6aEPi96aZBB/nFz8FgYldTAhwYEVMb+5A==
+ secondary accounting 10.24.58.2 key cipher $c$3$pRuATQDl74/Ur0IeqpmOv/uoxa2fFRX9xN29XTuyJ4NaODY=
+ user-name-format without-domain
+#
+radius scheme system
+ server-type extended
+ primary authentication 127.0.0.1 1645
+ primary accounting 127.0.0.1 1646
+ user-name-format without-domain
+#
+domain canyonsdistrict
+ authentication login local
+ authorization login local
+ accounting login local
+ authorization command hwtacacs-scheme tacacs local
+ accounting command hwtacacs-scheme tacacs
+ access-limit disable
+ state active
+ idle-cut disable
+ self-service-url disable
+domain system
+ access-limit disable
+ state active
+ idle-cut disable
+ self-service-url disable
+#
+user-group system
+ group-attribute allow-guest
+#
+local-user admin
+ password cipher $c$3$G3kpFQMlUIYzliiH80corMyQyaYMJnIw2f63PQ==
+ authorization-attribute level 3
+ service-type ssh
+ service-type web
+local-user cavemin
+ password cipher $c$3$No9l3PMqSNOIXIS0YZBOguQ1wqrgwFf/XBb04CaA/QhW
+ authorization-attribute level 3
+ service-type ssh terminal
+ service-type web
+#
+ stp disable
+#
+interface NULL0
+#
+interface Vlan-interface1
+ ip address 10.230.24.180 255.255.0.0
+#
+interface GigabitEthernet1/0/1
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/2
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/3
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/4
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/5
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/6
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/7
+ port link-mode bridge
+ description Stadium Outdoor South Port
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/8
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/9
+ port link-mode bridge
+ description Stadium Outdoor South Port
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/10
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/11
+ port link-mode bridge
+ description Stadium Outdoor Middle Port
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/12
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/13
+ port link-mode bridge
+ description Stadium Outdoor Middle Port
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/14
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/15
+ port link-mode bridge
+ description Stadium Outdoor North Port
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/16
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/17
+ port link-mode bridge
+ description Stadium Outdoor North Port
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/18
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/19
+ port link-mode bridge
+ description PressBOX
+ port access vlan 110
+ loopback-detection enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/20
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/21
+ port link-mode bridge
+ description PressBOX
+ port access vlan 110
+ loopback-detection enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/22
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/23
+ port link-mode bridge
+ description PressBOX
+ port access vlan 110
+ loopback-detection enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/24
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/25
+ port link-mode bridge
+ description PressBOX
+ port access vlan 110
+ loopback-detection enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/26
+ port link-mode bridge
+ description HUDL CAMERA - VLAN100
+ port access vlan 100
+ loopback-detection enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/27
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/28
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/29
+ port link-mode bridge
+ description PressBOX
+ port access vlan 110
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/30
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/31
+ port link-mode bridge
+ description PressBOX
+ port access vlan 110
+ loopback-detection enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/32
+ port link-mode bridge
+ description AP Concessions
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/33
+ port link-mode bridge
+ description PressBOX
+ port access vlan 110
+ loopback-detection enable
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/34
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/35
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/36
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/37
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/38
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/39
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/40
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/41
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/42
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/43
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/44
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/45
+ port link-mode bridge
+ description AP
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/46
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/47
+ port link-mode bridge
+ port link-type hybrid
+ undo port hybrid vlan 1
+ port hybrid vlan 56 100 tagged
+ port hybrid vlan 250 untagged
+ port hybrid pvid vlan 250
+ voice vlan 40 enable
+ shutdown
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/48
+ port link-mode bridge
+ description Pressbox Camera
+ port access vlan 250
+ loopback-detection enable
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+ poe enable
+ lldp voice-vlan 40
+#
+interface GigabitEthernet1/0/49
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 200 240 tagged
+ port hybrid vlan 1 untagged
+ shutdown
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+#
+interface GigabitEthernet1/0/50
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 200 240 tagged
+ port hybrid vlan 1 untagged
+ shutdown
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+#
+interface GigabitEthernet1/0/51
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 200 240 tagged
+ port hybrid vlan 1 untagged
+ shutdown
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+#
+interface GigabitEthernet1/0/52
+ port link-mode bridge
+ description Uplink to MDF
+ port link-type trunk
+ port trunk permit vlan 1 40 100 110 200 240 250
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ broadcast-suppression pps 3000
+ undo jumboframe enable
+#
+interface Ten-GigabitEthernet1/1/1
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 200 240 tagged
+ port hybrid vlan 1 untagged
+#
+interface Ten-GigabitEthernet1/1/2
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 200 240 tagged
+ port hybrid vlan 1 untagged
+#
+nqa entry imclinktopologypleaseignore ping
+ type icmp-echo
+  destination ip 10.230.255.254
+  frequency 270000
+#
+ ip route-static 0.0.0.0 0.0.0.0 10.230.0.1
+#
+ snmp-agent
+ snmp-agent local-engineid 8000002B03002473C059C1
+ snmp-agent community read snmpc5dpub
+ snmp-agent community write snmpc5dpvt
+ snmp-agent sys-info contact CSD Help Desk 801-826-5544
+ snmp-agent sys-info location CCHS Press Box IDF .180
+ snmp-agent sys-info version all
+ snmp-agent group v3 cavemin authentication write-view ViewDefault acl 2000
+ snmp-agent target-host trap address udp-domain 10.24.47.1 params securityname cavemin v3 privacy
+ snmp-agent usm-user v3 cavemin cavemin cipher authentication-mode sha $c$3$WYAQUoaOzyS/C/cZ8BK1kIa0JjeDm8YVBw8CVkrbpEdK2fYvc/8= privacy
+-mode aes128 $c$3$/lz+sri2ZQCXgT0Y952Wx/5PrdTene3gtGzKGrAaKfOvDQ== acl 2000
+#
+ header login %
+UNAUTHORIZED ACCESS TO THIS NETWORK DEVICE IS PROHIBITED.
+
+You must have explicit permission to access|                       DDD
+or configure this device.  All activity    |                       DDD
+performed on this device may be logged and |                       DDD
+is subject to audit.  Violation of this    | .CCCCCC .SSSSSS   .DDDDDD
+policy may result in disciplinary action   |CCCC"    SSS      DDD" DDD
+and may be reported to law enforcement     |CCC      "SSSSSS. DDD  DDD
+authorities.  There is no right to privacy |CCCC.         SSS DDDD DDD
+on this device.                            | "CCCCCC .SSSSSS'  "DDDDDD
+
+
+%
+#
+ nqa schedule imclinktopologypleaseignore ping start-time now lifetime 630720000
+#
+ ntp-service source-interface Vlan-interface1
+ ntp-service unicast-server 10.25.10.250
+#
+ ssh server enable
+ sftp server enable
+#
+ load xml-configuration
+#
+ load tr069-configuration
+#
+user-interface aux 0
+ authentication-mode scheme
+user-interface vty 0 15
+ authentication-mode scheme
+ command accounting
+ user privilege level 3
+ protocol inbound ssh
+#
+return
