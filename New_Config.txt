@@ -1,4 +1,6 @@
-hostname HS-Corner-Canyon-Stadium-180
+conf
+
+hostname HS-Corner-Canyon-N222-080
 
 vlan 1
 exit
@@ -7,15 +9,15 @@ vlan 40
 exit
 
 vlan 56
-description A/V
+exit
+
+vlan 64
+exit
+
+vlan 72
 exit
 
 vlan 100
-description AppleTV
-exit
-
-vlan 110
-description PressBOX
 exit
 
 vlan 200
@@ -28,25 +30,36 @@ vlan 250
 exit
 
 interface vlan 1
-ip address 10.230.24.180/16
+ip address 10.230.24.80/16
 exit
 
 ip route 0.0.0.0/0 10.230.0.1
-exit
 
-interface 1/1/1-1/1/48,2/1/1-2/1/24
+interface 1/1/1-1/1/48,2/1/1-2/1/48,3/1/1-3/1/48,4/1/1-4/1/48,5/1/1-5/1/48,6/1/1-6/1/48,7/1/1-7/1/48,8/1/1-8/1/24
 no shutdown
 no routing
 vlan trunk native 1
 vlan trunk allow 1,40,100,200,240
 
-interface 1/1/19,1/1/21,1/1/23,1/1/25,1/1/29,1/1/31,1/1/33
-vlan access 110
+interface 1/1/2,1/1/15,1/1/20,1/1/31,1/1/38,2/1/9
+vlan access 64
 
-interface 1/1/26
+interface 1/1/4,1/1/17,1/1/22,1/1/33,1/1/40,2/1/11,3/1/11,3/1/14,3/1/25,3/1/28,3/1/40,3/1/43,4/1/6,4/1/11,4/1/20,4/1/25,4/1/39,6/1/1
+vlan access 56
+
+interface 1/1/11,1/1/16,1/1/23,1/1/28,1/1/39,2/1/5,2/1/16,3/1/7,3/1/10,3/1/17,3/1/20,3/1/35,3/1/38,4/1/2,4/1/3,4/1/16,4/1/21,4/1/29,4/1/46
 vlan access 100
 
-interface 1/1/48
+interface 1/1/13,1/1/18,1/1/29,1/1/36,1/1/47,2/1/7,3/1/9,3/1/12,3/1/23,3/1/26,3/1/41,3/1/42,4/1/4,4/1/9,4/1/18,4/1/23,4/1/37,5/1/48
+vlan access 72
+
+interface 2/1/2,2/1/4,2/1/8,2/1/44,2/1/46-2/1/48,3/1/46,3/1/48,6/1/5,6/1/7
 vlan access 250
+
+vsf split-detect mgm
+
+write mem
+
+vsf secondary 8
 
 write mem

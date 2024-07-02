@@ -1,7 +1,4 @@
-#Add consolidation for description and vlan access
-
-
-#Declares File Variables
+# Declares File Variables
 old_config_file = open("Old_Config.txt", "r")
 old_config_txt = old_config_file.readlines()
 
@@ -68,7 +65,6 @@ def configure_vlan_interface(ip_address: str):
     new_config_file.write("interface vlan 1\n")
     new_config_file.write(f"ip address {ip_address}/16\n")
     new_config_file.write("exit\n\n")
-    # new_config_file.write(f"{octets[0]}.{octets[1]}.0.1\n\n")
     configure_ip_routing(octets[0], octets[1])
 
 def configure_ip_routing(octet1: str, octet2: str):
@@ -136,6 +132,7 @@ def get_stack() -> Port_Group:
 
         if "sysname" in line:
             hostname = line[9:line.index("\n")]
+            hostname = hostname.replace(" ", "_")
             hostname = hostname.replace("_", "-")
             new_config_file.write(f"hostname {hostname}\n\n")
         
@@ -157,6 +154,16 @@ def get_stack() -> Port_Group:
             location = None
             description = None
             access_vlan = None
+        
+    last_port = stack.port_list[-1]
+    last_port_number = last_port.simple_location[1]
+    last_port_switch = last_port.simple_location[0]
+    if last_port_number != 48:
+        print("here")
+        for i in range(49 - last_port_number,49):
+            location = f"{last_port_switch}/1/{i}"
+            port = Port(location)
+            stack.add_port(port)
 
     old_switch_count = stack.port_list[-1].simple_location[0]
     delta = switch_count - old_switch_count
@@ -266,11 +273,7 @@ def get_interface(group: Port_Group):
     interface_prompt += get_interface_range(range)
     interface_prompt += "\n"    
     return interface_prompt
-
         
-
-
-
 configure_stack()
 
 
