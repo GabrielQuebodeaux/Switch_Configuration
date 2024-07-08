@@ -1,5 +1,6 @@
 # Declares File Variables
-old_config_file = open("Old_Config.txt", "r")
+file_name = input("Enter File Name: ")
+old_config_file = open(file_name, "r")
 old_config_txt = old_config_file.readlines()
 
 new_config_file = open("New_Config.txt", "w")

@@ -44,6 +44,7 @@ class Port_Group:
             if self.description is not None:
                 description_prompt = self.get_description_prompt()
                 configuration_prompts.append(description_prompt)
+        configuration_prompts.append("\n")
         return configuration_prompts
     def get_interface_prompt(self) -> str:
         interface_prompt = "interface "
@@ -97,12 +98,13 @@ class Port_Group:
         ]
     
 class Stack:
-    def __init__(self, hostname: str, ip_address: str, ports: Port_Group):
+    def __init__(self, hostname: str, ip_address: str, ports: Port_Group, vlan_access_prompts: list):
         self.num_48_port_switches = int(input("Number of 48 Port Switches: "))
         self.has_24_port_switch = input("Stack Has 24 Port Switch? (y/n): ") == "y" 
         self.hostname = hostname
         self.ip_address = ip_address
         self.ports = ports
+        self.vlan_access_prompts = vlan_access_prompts
     def configure(self):
         prompts = []
         hostname_prompt = self.get_hostname_prompt()
@@ -111,14 +113,17 @@ class Stack:
         for prompt in vlan_interface_prompts:
             prompts.append(prompt)
         prompts.append("\n")
-        ip_route_prompts = self.get_ip_route_prompts()
-        for prompt in ip_route_prompts:
-            prompts.append(prompt)
+        ip_route_prompt = self.get_ip_route_prompts()
+        prompts.append(ip_route_prompt)
         prompts.append("\n")
+        self.configure_new()
         switch_configuration_prompts = self.ports.configure()
         for prompt in switch_configuration_prompts:
             prompts.append(prompt)
-
+        for prompt_list in self.vlan_access_prompts:
+            for prompt in prompt_list:
+                prompts.append(prompt)
+        prompts.append("vsf split-detect mgm")
         new_config_file.writelines(prompts)
 
     def get_hostname_prompt(self):
@@ -140,17 +145,36 @@ class Stack:
             else:
                 octets.append(octet)
                 octet = ""
-        return [
-            f"ip route 0.0.0.0/0 {octets[0]}.{octets[1]}.0.1\n",
-            "exit\n"
-        ]
+        return f"ip route 0.0.0.0/0 {octets[0]}.{octets[1]}.0.1\n"
+    def configure_new(self):
+        old_config_end_port = self.ports.get_port_list()[-1]
+        switch_number, port_number = old_config_end_port.get_coordinates()
+        if port_number != 48:
+            for i in range(port_number + 1, 49):
+                location = f"{switch_number}/1/{i}"
+                port = Port(location, None, None)
+                self.ports.add_port(port)
+        delta = self.num_48_port_switches - switch_number
+        for i in range(switch_number + 1, self.num_48_port_switches + 1):
+            for k in range(1, 49):
+                location = f"{i}/1/{k}"
+                port = Port(location, None, None)
+                self.ports.add_port(port)
+        if self.has_24_port_switch:
+            for i in range(1, 25):
+                location = f"{self.num_48_port_switches + 1}/1/{i}"
+                port = Port(location, None, None)
+                self.ports.add_port(port)
 
+            
 class Config_Tracer:
     def __init__(self, old_config_file, new_config_file):
         self.old_config = old_config_file.readlines()
         self.new_config_file = new_config_file
     def trace(self):
         ports = Port_Group(None, None)
+        vlan_access_table = []
+        vlan_access_ports = []
         hostname = None
         ip_address = None
         location = None
@@ -173,19 +197,40 @@ class Config_Tracer:
             elif "#" in line and location is not None:
                 port = Port(location, vlan_access, description)
                 ports.add_port(port)
+
+                if vlan_access in vlan_access_table and vlan_access is not None:
+                    index = vlan_access_table.index(vlan_access)
+                    vlan_access_ports[index].add_port(port)
+                elif vlan_access is not None:
+                    vlan_access_table.append(vlan_access)
+                    vlan_access_ports.append(Port_Group(vlan_access, None))
+                    vlan_access_ports[-1].add_port(port)
                 location = None
                 vlan_access = None
                 description = None
-        stack = Stack(hostname, ip_address, ports)
+        vlan_access_prompts = []
+        for group in vlan_access_ports:
+            vlan_access_prompts.append(group.configure())
+        stack = Stack(hostname, ip_address, ports, vlan_access_prompts)
         stack.configure()
 
 
-    
+
+
+
 
 # Declares File Variables
 old_config_file = open("Old_Config.txt", "r")
 new_config_file = open("New_Config.txt", "w")
 
 
-config_tracer = Config_Tracer(old_config_file, new_config_file)
-config_tracer.trace()
+
+prompt = input(":")
+print(prompt)
+if "conf" in prompt:                 
+    print("here")
+    config_tracer = Config_Tracer(old_config_file, new_config_file)
+    config_tracer.trace()
+
+
+
