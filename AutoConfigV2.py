@@ -153,12 +153,18 @@ class Stack:
     def configure_new(self):
         old_config_end_port = self.ports.get_port_list()[-1]
         switch_number, port_number = old_config_end_port.get_coordinates()
+        delta = self.num_48_port_switches - switch_number
+        if delta < 0:
+            raise Exception("Switch Loss Detected")
+        elif delta > 1:
+            print(f"{delta} Excess Switches Detected")
+            enter = input("*Enter*:")
+
         if port_number != 48:
             for i in range(port_number + 1, 49):
                 location = f"{switch_number}/1/{i}"
                 port = Port(location, None, None)
                 self.ports.add_port(port)
-        delta = self.num_48_port_switches - switch_number
         for i in range(switch_number + 1, self.num_48_port_switches + 1):
             for k in range(1, 49):
                 location = f"{i}/1/{k}"
@@ -217,15 +223,16 @@ class Config_Tracer:
         stack = Stack(hostname, ip_address, ports, vlan_access_prompts)
         stack.configure()
 
-# Declares File Variables
-old_config_file = open("Old_Config.txt", "r")
-new_config_file = open("New_Config.txt", "w")
 
+prompt = ""
+while prompt != "q":
+    prompt = input(":")
 
-
-prompt = input(":")
-print(prompt)
-if "conf" in prompt:                 
-    print("here")
-    config_tracer = Config_Tracer(old_config_file, new_config_file)
-    config_tracer.trace()
+    if "conf" in prompt:
+        old_config_file = open("Old_Config.txt", "r")
+        new_config_file = open("New_Config.txt", "w")
+        config_tracer = Config_Tracer(old_config_file, new_config_file)
+        config_tracer.trace()
+        print("*New Configuration Generated Successfully*")
+        old_config_file.close()
+        new_config_file.close()
