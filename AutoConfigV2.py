@@ -1,3 +1,7 @@
+# Declares File Variables
+old_config_file = open("Old_Config.txt", "r")
+new_config_file = open("New_Config.txt", "w")
+
 class Port:
     def __init__(self, location: str, vlan_access: str, description: str):
         self.location = location
@@ -166,7 +170,6 @@ class Stack:
                 port = Port(location, None, None)
                 self.ports.add_port(port)
 
-            
 class Config_Tracer:
     def __init__(self, old_config_file, new_config_file):
         self.old_config = old_config_file.readlines()
@@ -214,11 +217,6 @@ class Config_Tracer:
         stack = Stack(hostname, ip_address, ports, vlan_access_prompts)
         stack.configure()
 
-
-
-
-
-
 # Declares File Variables
 old_config_file = open("Old_Config.txt", "r")
 new_config_file = open("New_Config.txt", "w")
@@ -231,6 +229,3 @@ if "conf" in prompt:
     print("here")
     config_tracer = Config_Tracer(old_config_file, new_config_file)
     config_tracer.trace()
-
-
-
