@@ -26,6 +26,9 @@ class Port_Group:
         self.vlan_access = vlan_access
         self.description = description
         self.port_list = []
+        if description is not None:
+            if "ap" in description.lower() or "ruckus" in description.lower():
+                self.description = None
     def add_port(self, port: Port):
         self.port_list.append(port)
         return self.port_list
@@ -39,12 +42,13 @@ class Port_Group:
         configuration_prompts = []
         interface_prompt = self.get_interface_prompt()
         configuration_prompts.append(interface_prompt)
-        if self.vlan_access is None:
+        if self.vlan_access is None and self.description is None:
             for prompt in self.get_vanilla_prompt():
                 configuration_prompts.append(prompt)
         else:
-            vlan_access_prompt = self.get_vlan_access_prompt()
-            configuration_prompts.append(vlan_access_prompt)
+            if self.vlan_access is not None:
+                vlan_access_prompt = self.get_vlan_access_prompt()
+                configuration_prompts.append(vlan_access_prompt)
             if self.description is not None:
                 description_prompt = self.get_description_prompt()
                 configuration_prompts.append(description_prompt)
@@ -156,9 +160,9 @@ class Stack:
         delta = self.num_48_port_switches - switch_number
         if delta < 0:
             raise Exception("Switch Loss Detected")
-        elif delta > 1:
-            print(f"{delta} Excess Switches Detected")
-            enter = input("*Enter*:")
+        elif delta > 0:
+            print("*Excess Switches Detected*")
+            input(f"*Recommended Number of 48 Port Switches: {self.num_48_port_switches - delta}*")
 
         if port_number != 48:
             for i in range(port_number + 1, 49):
@@ -184,6 +188,8 @@ class Config_Tracer:
         ports = Port_Group(None, None)
         vlan_access_table = []
         vlan_access_ports = []
+        description_table = []
+        description_ports = []
         hostname = None
         ip_address = None
         location = None
@@ -214,20 +220,31 @@ class Config_Tracer:
                     vlan_access_table.append(vlan_access)
                     vlan_access_ports.append(Port_Group(vlan_access, None))
                     vlan_access_ports[-1].add_port(port)
+                
+                if description is not None:
+                    invalid = "ap" in description.lower() or "ruckus" in description.lower()
+                    if description in description_table and not invalid:
+                        index = description_table.index(description)
+                        description_ports[index].add_port(port)
+                    elif not invalid:
+                        description_table.append(description)
+                        description_ports.append(Port_Group(None, description))
+                        description_ports[-1].add_port(port)
                 location = None
                 vlan_access = None
                 description = None
-        vlan_access_prompts = []
+        prompts = []
         for group in vlan_access_ports:
-            vlan_access_prompts.append(group.configure())
-        stack = Stack(hostname, ip_address, ports, vlan_access_prompts)
+            prompts.append(group.configure())
+        for group in description_ports:
+            prompts.append(group.configure())
+        stack = Stack(hostname, ip_address, ports, prompts)
         stack.configure()
 
 
 prompt = ""
 while prompt != "q":
     prompt = input(":")
-
     if "conf" in prompt:
         old_config_file = open("Old_Config.txt", "r")
         new_config_file = open("New_Config.txt", "w")
