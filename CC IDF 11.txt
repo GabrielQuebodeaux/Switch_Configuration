@@ -1,0 +1,53 @@
+vsf secondary 4
+
+hostname HS-CORNER-CANYON-C105-011
+
+interface vlan 1
+ip address 10.230.24.11/16
+exit
+
+ip route 0.0.0.0/0 10.230.0.1
+
+interface 1/1/1-1/1/48,2/1/1-2/1/48,3/1/1-3/1/48,4/1/1-4/1/48
+no shutdown
+no routing
+vlan trunk native 1
+vlan trunk allow 1,40,100,200,240
+
+interface 1/1/13,1/1/30,2/1/36,3/1/4,3/1/5,3/1/21,4/1/24
+vlan access 72
+
+interface 1/1/17,1/1/34,2/1/40,2/1/42,3/1/8,3/1/9,3/1/25,4/1/28
+vlan access 56
+
+interface 1/1/23,2/1/1,3/1/6,3/1/19,4/1/5,4/1/22
+vlan access 100
+
+interface 1/1/32,2/1/38,3/1/7,3/1/23,4/1/26
+vlan access 64
+
+interface 2/1/42
+description Digital Signage Window Dispaly N Hall First Floor
+
+interface 3/1/6
+description ATV
+
+interface 4/1/5
+description TECH OFFICE PC CONNECTION
+
+interface 4/1/7
+description TECH PRINTER
+
+interface 4/1/21
+description DIGITAL SIGNAGE NORTH MEDIA CENTER COMMONS
+
+interface 4/1/22
+description ATV Rm ATRIUM
+
+interface 4/1/24
+description HBBLLS ATRIUM VLAN72
+
+vsf split-detect mgm
+
+write memory
+

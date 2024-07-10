@@ -1,5 +1,3 @@
-i = "1"
-s = ""
-s += i
-
-print(s)
+i = "(2,1)"
+i = tuple(i)
+print(i)

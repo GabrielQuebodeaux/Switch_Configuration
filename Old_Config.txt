@@ -2,7 +2,7 @@
 #
  version 5.20.105, Release 1809P10-US
 #
- sysname HS_Corner Canyon_E111-060
+ sysname HS_CORNER CANYON_C105_011
 #
  clock timezone "Mountain Time(US,Canada)" minus 07:00:00 
  clock summer-time summer-time repeating 02:00:00 2000 March second Sunday 02:00:00 2000 November first Sunday  01:00:00
@@ -13,12 +13,9 @@
  voice vlan mac-address 6416-7f00-0000 mask ffff-ff00-0000
  voice vlan track lldp
 #
- irf domain 60
  irf mac-address persistent timer
  irf auto-update enable
  undo irf link-delay
- irf member 1 priority 32
- irf member 2 priority 30
 #
  domain default enable clearpass 
 #
@@ -93,12 +90,14 @@ vlan 72
  igmp-snooping version 3
 #
 vlan 100
+ description appleTV
 #
 vlan 200
 #
 vlan 240
 #
 vlan 250
+ description IP CAMERAS
 #
 hwtacacs scheme tacacs
  primary authentication 10.24.49.1 key cipher $c$3$o6aukcCyvs5VhIjuaf67HxAqFK1BRxGphc0UaFtfbM8zJhMVP5MQrEbynw==
@@ -106,12 +105,12 @@ hwtacacs scheme tacacs
  primary accounting 10.24.49.1 key cipher $c$3$8cbNCx3qZ/T46sjL0klnrrG0BJ/L5z0kUj8GHS4KouXlxO83wZqErBROuQ==
  user-name-format without-domain
 hwtacacs scheme clearpass
- primary authentication 10.24.58.1 key cipher $c$3$45ofgNyBIfFz0FhEFBz3HM7gpkvLGmxTcKpCKFS+PouBuBxnkn8ny8kh4g==
- secondary authentication 10.24.58.2 key cipher $c$3$KnQGyNulspKANauBsQpSJZL9MkaifeWIpGj8Gcr9IHw20qOS5XWmgr4WBw==
- primary authorization 10.24.58.1 key cipher $c$3$fXzkhwchNZChT57gOgd5468XF1Qs8BhW87E3dexd8sUqIwMNZJ3XHN4RcQ==
- secondary authorization 10.24.58.2 key cipher $c$3$FwKFtJ3zxFqb2kmHUnwJMgRHBO58JSIr4hGUnWLmDr9AJ/ubC6NV6qfULQ==
- primary accounting 10.24.58.1 key cipher $c$3$7rg0Z62y82hJK66sLI8kgPB4PC5NHwIrkl792FeADBkg7I9PiyNK2nuHsg==
- secondary accounting 10.24.58.2 key cipher $c$3$277emo3Mb13CyIN+8aOAQSgsmsTaNUU7lHusQm1Umq5HHiPlxW2DQ2tMxg==
+ primary authentication 10.24.58.1 key cipher $c$3$5JPc4lvUXe4fFxDUzGg/CA6p35Fw2PtY0Fes67MhhYFbfqgcaAQsVTFbeA==
+ secondary authentication 10.24.58.2 key cipher $c$3$My2Rh0dgoPsNj3f4EAh0ReKvxN5+Vuj+LN6zy9NoRIkOAWcAGVDELjLNOQ==
+ primary authorization 10.24.58.1 key cipher $c$3$zNWUVLjshI9matlEeSmVjVChSAiWejGvH4YQvTAHkpGtsoPBGlTsGerlWA==
+ secondary authorization 10.24.58.2 key cipher $c$3$R7RE+7GpuePS7WN0mh2ZCWloOYd4nwS/9/UEO8SP8S/qfCIby3s1gajgVw==
+ primary accounting 10.24.58.1 key cipher $c$3$DhsmgMs1iS/3cFNS4XNaeANO82Jlk0CEhEYh2Qgt2/PdMT9CTq3MJahSEA==
+ secondary accounting 10.24.58.2 key cipher $c$3$RlFa7P1wgdahfEmgeQ4IRoj1xdlbOyyyjMqmi3hBMEbuW8L5wngyzq/FdA==
  user-name-format without-domain
 #
 radius scheme system
@@ -150,7 +149,7 @@ user-group system
  group-attribute allow-guest
 #
 local-user cavemin
- password cipher $c$3$qhssKKLaBv8U9PkoEqZk8FsBtT7QfchiBcMH5mAsIxWJ
+ password cipher $c$3$2dwry7XuNXFxuqSDiGOStNLGlGzOZzsjZgh9rD18er42
  authorization-attribute level 3
  service-type ssh terminal
  service-type web
@@ -158,42 +157,36 @@ local-user cavemin
 interface NULL0
 #
 interface Vlan-interface1
- ip address 10.230.24.60 255.255.0.0 
+ ip address 10.230.24.11 255.255.0.0 
 #
 interface GigabitEthernet1/0/1
  port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 250 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
+ description PA System Broadcore Connection
+ port access vlan 40
  loopback-detection enable
- loopback-detection control enable
  loopback-detection action shutdown
  poe enable
  lldp voice-vlan 40
  qos trust dscp
+ dhcp-snooping trust
 #
 interface GigabitEthernet1/0/2
  port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
+ description Uplink to .01
+ port link-type trunk
+ port trunk permit vlan 1 40 56 64 72 100 200 240 250
  loopback-detection enable
  loopback-detection control enable
  loopback-detection action shutdown
  poe enable
  lldp voice-vlan 40
  qos trust dscp
+ dhcp-snooping trust
 #
 interface GigabitEthernet1/0/3
  port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
+ port access vlan 72
  loopback-detection enable
- loopback-detection control enable
  loopback-detection action shutdown
  poe enable
  lldp voice-vlan 40
@@ -214,6 +207,15 @@ interface GigabitEthernet1/0/4
 #
 interface GigabitEthernet1/0/5
  port link-mode bridge
+ port access vlan 72
+ loopback-detection enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+ qos trust dscp
+#
+interface GigabitEthernet1/0/6
+ port link-mode bridge
  port link-type hybrid
  port hybrid vlan 56 100 200 240 tagged
  port hybrid vlan 1 untagged
@@ -225,7 +227,7 @@ interface GigabitEthernet1/0/5
  lldp voice-vlan 40
  qos trust dscp
 #
-interface GigabitEthernet1/0/6
+interface GigabitEthernet1/0/7
  port link-mode bridge
  port access vlan 72
  loopback-detection enable
@@ -234,36 +236,18 @@ interface GigabitEthernet1/0/6
  lldp voice-vlan 40
  qos trust dscp
 #
-interface GigabitEthernet1/0/7
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
 interface GigabitEthernet1/0/8
  port link-mode bridge
- port access vlan 64
+ port access vlan 72
  loopback-detection enable
- loopback-detection action shutdown
  poe enable
  lldp voice-vlan 40
  qos trust dscp
 #
 interface GigabitEthernet1/0/9
  port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
+ port access vlan 72
  loopback-detection enable
- loopback-detection control enable
  loopback-detection action shutdown
  poe enable
  lldp voice-vlan 40
@@ -271,8 +255,12 @@ interface GigabitEthernet1/0/9
 #
 interface GigabitEthernet1/0/10
  port link-mode bridge
- port access vlan 100
+ port link-type hybrid
+ port hybrid vlan 56 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ voice vlan 40 enable
  loopback-detection enable
+ loopback-detection control enable
  loopback-detection action shutdown
  poe enable
  lldp voice-vlan 40
@@ -280,12 +268,9 @@ interface GigabitEthernet1/0/10
 #
 interface GigabitEthernet1/0/11
  port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
+ description HUBBELLS FRONT OFFICE
+ port access vlan 72
  loopback-detection enable
- loopback-detection control enable
  loopback-detection action shutdown
  poe enable
  lldp voice-vlan 40
@@ -293,15 +278,6 @@ interface GigabitEthernet1/0/11
 #
 interface GigabitEthernet1/0/12
  port link-mode bridge
- port access vlan 56
- loopback-detection enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/13
- port link-mode bridge
  port link-type hybrid
  port hybrid vlan 56 100 200 240 tagged
  port hybrid vlan 1 untagged
@@ -312,6 +288,17 @@ interface GigabitEthernet1/0/13
  poe enable
  lldp voice-vlan 40
  qos trust dscp
+#
+interface GigabitEthernet1/0/13
+ port link-mode bridge
+ description PA System LAN Connection
+ port access vlan 72
+ loopback-detection enable
+ loopback-detection action shutdown
+ poe enable
+ lldp voice-vlan 40
+ qos trust dscp
+ dhcp-snooping trust
 #
 interface GigabitEthernet1/0/14
  port link-mode bridge
@@ -328,12 +315,8 @@ interface GigabitEthernet1/0/14
 #
 interface GigabitEthernet1/0/15
  port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
+ port access vlan 72
  loopback-detection enable
- loopback-detection control enable
  loopback-detection action shutdown
  poe enable
  lldp voice-vlan 40
@@ -354,12 +337,8 @@ interface GigabitEthernet1/0/16
 #
 interface GigabitEthernet1/0/17
  port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
+ port access vlan 72
  loopback-detection enable
- loopback-detection control enable
  loopback-detection action shutdown
  poe enable
  lldp voice-vlan 40
@@ -380,12 +359,8 @@ interface GigabitEthernet1/0/18
 #
 interface GigabitEthernet1/0/19
  port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
+ port access vlan 72
  loopback-detection enable
- loopback-detection control enable
  loopback-detection action shutdown
  poe enable
  lldp voice-vlan 40
@@ -406,12 +381,8 @@ interface GigabitEthernet1/0/20
 #
 interface GigabitEthernet1/0/21
  port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
+ port access vlan 72
  loopback-detection enable
- loopback-detection control enable
  loopback-detection action shutdown
  poe enable
  lldp voice-vlan 40
@@ -432,19 +403,18 @@ interface GigabitEthernet1/0/22
 #
 interface GigabitEthernet1/0/23
  port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
+ description IP CAM Server
+ port access vlan 250
  loopback-detection enable
- loopback-detection control enable
  loopback-detection action shutdown
  poe enable
  lldp voice-vlan 40
  qos trust dscp
+ dhcp-snooping trust
 #
 interface GigabitEthernet1/0/24
  port link-mode bridge
+ description AP LMC Office
  port link-type hybrid
  port hybrid vlan 56 100 200 240 tagged
  port hybrid vlan 1 untagged
@@ -456,959 +426,24 @@ interface GigabitEthernet1/0/24
  lldp voice-vlan 40
  qos trust dscp
 #
-interface GigabitEthernet1/0/25
+interface Ten-GigabitEthernet1/0/25
  port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/26
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/27
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/28
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/29
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/30
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/31
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/32
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/33
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/34
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/35
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/36
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/37
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/38
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/39
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/40
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/41
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/42
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/43
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/44
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/45
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/46
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/47
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet1/0/48
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/1
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 250 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/2
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/3
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/4
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/5
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/6
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/7
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/8
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/9
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/10
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/11
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/12
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/13
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/14
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/15
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/16
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/17
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/18
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/19
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/20
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/21
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/22
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/23
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/24
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/25
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/26
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/27
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/28
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/29
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/30
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/31
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/32
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/33
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/34
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/35
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/36
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/37
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/38
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/39
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/40
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/41
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/42
- port link-mode bridge
- description IP CAM .25
- port access vlan 250
- loopback-detection enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/43
- port link-mode bridge
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/44
- port link-mode bridge
- description IP CAM .87
- port access vlan 250
- loopback-detection enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/45
- port link-mode bridge
- description IP CAM .97
- port access vlan 250
- loopback-detection enable
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/46
- port link-mode bridge
- description IP CAM .92
- port access vlan 250
- loopback-detection enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/47
- port link-mode bridge
- description AP room PE111
- port link-type hybrid
- port hybrid vlan 56 100 200 240 tagged
- port hybrid vlan 1 untagged
- voice vlan 40 enable
- loopback-detection enable
- loopback-detection control enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
-#
-interface GigabitEthernet2/0/48
- port link-mode bridge
- description IP CAM .93
- port access vlan 250
- loopback-detection enable
- loopback-detection action shutdown
- poe enable
- lldp voice-vlan 40
- qos trust dscp
 #
-interface M-GigabitEthernet0/0/0
-#
-interface Ten-GigabitEthernet1/0/51
- port link-mode bridge
- port link-type trunk
- port trunk permit vlan 1 40 56 64 72 200 240
- qos trust dscp
-#
-interface Ten-GigabitEthernet1/0/52
+interface Ten-GigabitEthernet1/0/26
  port link-mode bridge
- port link-type trunk
- port trunk permit vlan 1 40 56 64 72 100 200 240 250
- qos trust dscp
 #
-interface Ten-GigabitEthernet2/0/51
+interface Ten-GigabitEthernet1/0/27
  port link-mode bridge
 #
-interface Ten-GigabitEthernet2/0/52
+interface Ten-GigabitEthernet1/0/28
  port link-mode bridge
-#
-interface Ten-GigabitEthernet1/0/49
-#
-interface Ten-GigabitEthernet1/0/50
-#
-interface Ten-GigabitEthernet2/0/49
-#
-interface Ten-GigabitEthernet2/0/50
 #
 nqa entry imclinktopologypleaseignore ping
  type icmp-echo
   destination ip 10.230.255.254
   frequency 270000
+#
+ dhcp-snooping
 #
  ip route-static 0.0.0.0 0.0.0.0 10.230.0.1
 #
@@ -1416,13 +451,13 @@ nqa entry imclinktopologypleaseignore ping
  info-center logbuffer size 1024
 #
  snmp-agent
- snmp-agent local-engineid 8000000B03D07E28B0F599
+ snmp-agent local-engineid 8000000B03CC3E5F490E29
  snmp-agent sys-info contact CSD Helpdesk 801-826-5544
- snmp-agent sys-info location Rm E111 Gym
+ snmp-agent sys-info location MDF, Room C105
  snmp-agent sys-info version v3
  snmp-agent group v3 cavemin authentication write-view ViewDefault acl 2000
  snmp-agent target-host trap address udp-domain 10.24.47.1 params securityname cavemin v3 privacy
- snmp-agent usm-user v3 cavemin cavemin cipher authentication-mode sha $c$3$znQwAdbT7CbOD4UbeM3U4OT4hJHsGW7TNx8RFOfGtxNVDryzgJ4= privacy-mode aes128 $c$3$McA+dGb0JnFFX5+RFvKIowCIA8lev5DFCfOYBe96qFfJZg== acl 2000
+ snmp-agent usm-user v3 cavemin cavemin cipher authentication-mode sha $c$3$rytTSSrdZX6dmnMyIxYN1UAL6J04kd5YYWxe0OwOJt9EnM8aL2M= privacy-mode aes128 $c$3$VgMq27fvaWDxc9fcBevswMUUUqg30VHx6UfFW5ejBAG6ow== acl 2000
 #
  header login %
 UNAUTHORIZED ACCESS TO THIS NETWORK DEVICE IS PROHIBITED.
@@ -1452,7 +487,7 @@ on this device.                            | "CCCCCC .SSSSSS'  "DDDDDD
 #
  load tr069-configuration
 #
-user-interface aux 0 1
+user-interface aux 0
  authentication-mode scheme
 user-interface vty 0 15
  acl 2000 inbound
@@ -1460,19 +495,7 @@ user-interface vty 0 15
  command authorization
  command accounting
  user privilege level 3
- set authentication password cipher $c$3$azO3E0ETa2sOMSD3On4ZfiTolZ5njYFo0SfEhQ==
+ set authentication password cipher $c$3$y9NetHB9wWGw17r2uLiqL60VFY6Ge1qXNXfYaQ==
  protocol inbound ssh
-#
-irf-port 1/1
- port group interface Ten-GigabitEthernet1/0/49 mode enhanced
-#
-irf-port 1/2
- port group interface Ten-GigabitEthernet1/0/50 mode enhanced
-#
-irf-port 2/1
- port group interface Ten-GigabitEthernet2/0/49 mode enhanced
-#
-irf-port 2/2
- port group interface Ten-GigabitEthernet2/0/50 mode enhanced
 #
 return

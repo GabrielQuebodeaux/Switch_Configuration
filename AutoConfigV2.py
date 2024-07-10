@@ -8,6 +8,10 @@ class Port:
         self.coordinates = self.set_coordinates(self.location)
         self.vlan_access = vlan_access
         self.description = description
+        if self.description is None:
+            return
+        elif "ap" in self.description.lower() or "ruckus" in self.description.lower():
+            self.description = None
     def set_coordinates(self, location: str) -> tuple:
         switch_coordinate = int(location[0:location.index("/1/")])
         port_coordinate = int(location[location.index("/1/") + 3:])
@@ -20,15 +24,15 @@ class Port:
         return self.vlan_access
     def get_description(self):
         return self.description
+    def remap(self, new_switch: int):
+        self.location = str(new_switch) + self.location[self.location.index("/"):]
+        return self
 
 class Port_Group:
     def __init__(self, vlan_access: int, description: str):
         self.vlan_access = vlan_access
         self.description = description
         self.port_list = []
-        if description is not None:
-            if "ap" in description.lower() or "ruckus" in description.lower():
-                self.description = None
     def add_port(self, port: Port):
         self.port_list.append(port)
         return self.port_list
@@ -104,16 +108,39 @@ class Port_Group:
             "vlan trunk native 1\n",
             "vlan trunk allow 1,40,100,200,240\n"
         ]
-    
+
+class Switch(Port_Group):
+    def __init__(self, vsf_member: int):
+        self.vsf_member = vsf_member
+        self.port_list = []
+        super().__init__(None, None)
+    def get_vsf_member(self):
+        return self.vsf_member
+    def remap(self, new_switch: int):
+        self.vsf_member = new_switch
+        for port in self.port_list:
+            port.remap(new_switch)
+        return self
+
+
 class Stack:
-    def __init__(self, hostname: str, ip_address: str, ports: Port_Group, vlan_access_prompts: list):
+    def __init__(self, hostname: str, ip_address: str, switch_list: list, groups: Port_Group, remap = False):
         self.num_48_port_switches = int(input("Number of 48 Port Switches: "))
-        self.has_24_port_switch = input("Stack Has 24 Port Switch? (y/n): ") == "y" 
+        self.has_24_port_switch = input("Stack Has 24 Port Switch? (Y/N): ").lower() == "y"
         self.hostname = hostname
         self.ip_address = ip_address
-        self.ports = ports
-        self.vlan_access_prompts = vlan_access_prompts
-    def configure(self):
+        self.switch_list = switch_list
+        self.groups = groups
+        if self.num_48_port_switches < 3 and not self.has_24_port_switch or self.num_48_port_switches == 1:
+            return
+        configure_secondary = input("Configure Last Switch as Secondary? (Y/N): ").lower() == "y"
+        if not configure_secondary:
+            return
+        if self.has_24_port_switch:
+            new_config_file.write(f"vsf secondary {self.num_48_port_switches + 1}\n\n")
+        else:
+            new_config_file.write(f"vsf secondary {self.num_48_port_switches}\n\n")
+    def configure(self, remap = False):
         prompts = []
         hostname_prompt = self.get_hostname_prompt()
         prompts.append(hostname_prompt + "\n")
@@ -124,15 +151,26 @@ class Stack:
         ip_route_prompt = self.get_ip_route_prompts()
         prompts.append(ip_route_prompt)
         prompts.append("\n")
-        self.configure_new()
-        switch_configuration_prompts = self.ports.configure()
-        for prompt in switch_configuration_prompts:
-            prompts.append(prompt)
-        for prompt_list in self.vlan_access_prompts:
-            for prompt in prompt_list:
-                prompts.append(prompt)
-        prompts.append("vsf split-detect mgm")
+        self.configure_new(remap)
+        stack_groups = self.trace_stack()
+        for i in stack_groups:
+            for group in i:
+                for prompt in group.configure():
+                    prompts.append(prompt)
+        prompts.append("vsf split-detect mgm\n\n")
+        prompts.append("write memory\n\n")
         new_config_file.writelines(prompts)
+
+    def remap(self, new_order: tuple):
+        c = 1
+        temp_switch_list = []
+        for i in new_order:
+            switch = self.switch_list[i - 1].remap(c)
+            temp_switch_list.append(switch)
+            c += 1
+        self.switch_list = temp_switch_list
+        self.num_48_port_switches = len(self.switch_list)
+        self.configure(True)
 
     def get_hostname_prompt(self):
         return f"hostname {self.hostname}\n"
@@ -154,11 +192,43 @@ class Stack:
                 octets.append(octet)
                 octet = ""
         return f"ip route 0.0.0.0/0 {octets[0]}.{octets[1]}.0.1\n"
-    def configure_new(self):
-        old_config_end_port = self.ports.get_port_list()[-1]
+    
+    def trace_stack(self):
+        vlan_access_ports = []
+        vlan_access_list = []
+        description_ports = []
+        description_list = []
+        all_ports = [Port_Group(None, None)]
+        for switch in self.switch_list:
+            for port in switch.get_port_list():
+                all_ports[0].add_port(port)
+                vlan = port.get_vlan_access()
+                description = port.get_description()
+                if vlan is not None:
+                    if vlan in vlan_access_list:
+                        index = vlan_access_list.index(vlan)
+                        vlan_access_ports[index].add_port(port)
+                    else:
+                        vlan_access_list.append(vlan)
+                        group = Port_Group(vlan, None)
+                        group.add_port(port)
+                        vlan_access_ports.append(group)
+                if description is not None:
+                    if description in description_list:
+                        index = description_list.index(description)
+                        description_ports[index].add_port(port)
+                    else:
+                        description_list.append(description)
+                        group = Port_Group(None, description)
+                        group.add_port(port)
+                        description_ports.append(group)
+        return (all_ports, vlan_access_ports, description_ports)
+
+    def configure_new(self, remap = False):
+        old_config_end_port = self.switch_list[-1].get_port_list()[-1]
         switch_number, port_number = old_config_end_port.get_coordinates()
         delta = self.num_48_port_switches - switch_number
-        if delta < 0:
+        if delta < 0 and not remap:
             raise Exception("Switch Loss Detected")
         elif delta > 0:
             print("*Excess Switches Detected*")
@@ -168,24 +238,28 @@ class Stack:
             for i in range(port_number + 1, 49):
                 location = f"{switch_number}/1/{i}"
                 port = Port(location, None, None)
-                self.ports.add_port(port)
+                self.switch_list[-1].add_port(port)
         for i in range(switch_number + 1, self.num_48_port_switches + 1):
+            self.switch_list.append(Switch(i))
             for k in range(1, 49):
                 location = f"{i}/1/{k}"
                 port = Port(location, None, None)
-                self.ports.add_port(port)
+                self.switch_list[-1].add_port(port)
         if self.has_24_port_switch:
+            self.switch_list.append(Switch(self.num_48_port_switches + 1))
             for i in range(1, 25):
                 location = f"{self.num_48_port_switches + 1}/1/{i}"
                 port = Port(location, None, None)
-                self.ports.add_port(port)
+                self.switch_list[-1].add_port(port)
 
 class Config_Tracer:
     def __init__(self, old_config_file, new_config_file):
         self.old_config = old_config_file.readlines()
         self.new_config_file = new_config_file
-    def trace(self):
+    def trace(self, remap = False):
         ports = Port_Group(None, None)
+        current_switch = 1
+        switch_list = [Switch(1)]
         vlan_access_table = []
         vlan_access_ports = []
         description_table = []
@@ -211,7 +285,13 @@ class Config_Tracer:
                 description = line[13:-1]
             elif "#" in line and location is not None:
                 port = Port(location, vlan_access, description)
-                ports.add_port(port)
+                if port.coordinates[0] == current_switch:
+                    switch_list[current_switch - 1].add_port(port)
+                else:
+                    current_switch += 1
+                    switch = Switch(current_switch)
+                    switch.add_port(port)
+                    switch_list.append(switch)
 
                 if vlan_access in vlan_access_table and vlan_access is not None:
                     index = vlan_access_table.index(vlan_access)
@@ -234,22 +314,31 @@ class Config_Tracer:
                 vlan_access = None
                 description = None
         prompts = []
-        for group in vlan_access_ports:
-            prompts.append(group.configure())
-        for group in description_ports:
-            prompts.append(group.configure())
-        stack = Stack(hostname, ip_address, ports, prompts)
+        groups = vlan_access_ports + description_ports
+        stack = Stack(hostname, ip_address, switch_list, groups, remap)
         stack.configure()
+        return stack
 
 
 prompt = ""
 while prompt != "q":
     prompt = input(":")
-    if "conf" in prompt:
-        old_config_file = open("Old_Config.txt", "r")
+    old_config_file = open("Old_Config.txt", "r")
+    new_config_file = open("New_Config.txt", "w")
+    if "configure" in prompt:
         new_config_file = open("New_Config.txt", "w")
         config_tracer = Config_Tracer(old_config_file, new_config_file)
         config_tracer.trace()
         print("*New Configuration Generated Successfully*")
-        old_config_file.close()
-        new_config_file.close()
+    elif "remap" in prompt:
+        config_tracer = Config_Tracer(old_config_file, new_config_file)
+        stack = config_tracer.trace(True)
+        new_config_file = open("New_Config.txt", "w")
+        remap = input("Enter Remapped Order: ")
+        remap_list = []
+        for i in remap.strip():
+            if i != ",":
+                remap_list.append(int(i))
+        stack.remap(remap_list)
+    old_config_file.close()
+    new_config_file.close()
