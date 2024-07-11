@@ -33,15 +33,22 @@ class Port_Group:
         self.vlan_access = vlan_access
         self.description = description
         self.port_list = []
+    
+    #Adds a Port object to the port list
     def add_port(self, port: Port):
         self.port_list.append(port)
         return self.port_list
+    
     def get_vlan_access(self) -> str:
         return self.vlan_access
+    
     def get_description(self) -> str:
         return self.description
+    
     def get_port_list(self) -> list:
         return self.port_list
+    
+    #Returns a list of configuration prompts for the port group
     def configure(self) -> list:
         configuration_prompts = []
         interface_prompt = self.get_interface_prompt()
@@ -58,6 +65,7 @@ class Port_Group:
                 configuration_prompts.append(description_prompt)
         configuration_prompts.append("\n")
         return configuration_prompts
+    
     def get_interface_prompt(self) -> str:
         interface_prompt = "interface "
         interface_ranges = self.get_interface_ranges()
@@ -292,24 +300,7 @@ class Config_Tracer:
                     switch = Switch(current_switch)
                     switch.add_port(port)
                     switch_list.append(switch)
-
-                if vlan_access in vlan_access_table and vlan_access is not None:
-                    index = vlan_access_table.index(vlan_access)
-                    vlan_access_ports[index].add_port(port)
-                elif vlan_access is not None:
-                    vlan_access_table.append(vlan_access)
-                    vlan_access_ports.append(Port_Group(vlan_access, None))
-                    vlan_access_ports[-1].add_port(port)
                 
-                if description is not None:
-                    invalid = "ap" in description.lower() or "ruckus" in description.lower()
-                    if description in description_table and not invalid:
-                        index = description_table.index(description)
-                        description_ports[index].add_port(port)
-                    elif not invalid:
-                        description_table.append(description)
-                        description_ports.append(Port_Group(None, description))
-                        description_ports[-1].add_port(port)
                 location = None
                 vlan_access = None
                 description = None

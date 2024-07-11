@@ -1,3 +1,3 @@
-i = "(2,1)"
-i = tuple(i)
-print(i)
+string = "Gabe"
+string[0:] = "Not Gabe"
+print(string)
