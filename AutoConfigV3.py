@@ -29,7 +29,7 @@ class Port_Group:
             "no shutdown\n",
             "no routing\n",
             "vlan trunk native 1\n",
-            "vlan trunk allow 1,40,100,200,240\n\n",
+            "vlan trunk allowed 1,40,100,200,240\n\n",
         ]
 
     def append(self, port: Port):
@@ -130,12 +130,15 @@ class Stack:
         for group in description_groups:
             for command in group.get_configuration():
                 commands.append(command)
+        for command in self.configure_uplink():
+            commands.append(command)
+        commands.append("vsf split-detect mgm\n\n")
+        commands.append(f"vsf secondary-member {self.switches[-1].blade_number}\n\n")
         return commands
 
     def get_stack_information(self):
         all_ports, vlan_groups, description_groups = self.sort()
         information = []
-        num_switches = all_ports.ports[-1].blade_number
         for group in vlan_groups:
             information.append(str(group))
         for group in description_groups:
@@ -177,6 +180,18 @@ class Stack:
                 self.switches[-1].append(port)
                 all_ports.append(port)
         return (all_ports, vlan_groups, description_groups)
+
+    def configure_uplink(self):
+        port = self.switches[-1].ports[-1]
+        return [
+            f"interface {port.location}\n",
+            "description UPLINK to CORE\n",
+            "no shutdown\n" "no routing\n",
+            "vlan trunk native 1\n",
+            "vlan trunk allowed 1,40,56,70,72,100,200,240,250\n",
+            "dhcpv4-snooping trust\n",
+            "lacp mode active\n\n",
+        ]
 
 
 class Translator:

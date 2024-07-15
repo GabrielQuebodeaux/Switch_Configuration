@@ -1,0 +1,54 @@
+hostname HS-CORNER-CANYON-STADIUM-180
+
+interface vlan 1
+ip address 10.230.24.180/16
+exit
+
+ip route 0.0.0.0/0 10.230.0.1
+
+interface 1/1/1-1/1/52,2/1/1-2/1/24
+no shutdown
+no routing
+vlan trunk native 1
+vlan trunk allow 1,40,100,200,240
+
+interface 1/1/19,1/1/21,1/1/23,1/1/25,1/1/29,1/1/31,1/1/33
+vlan access 110
+
+interface 1/1/26
+vlan access 100
+
+interface 1/1/48
+vlan access 250
+
+interface 1/1/7,1/1/9
+description Stadium Outdoor South Port
+
+interface 1/1/11,1/1/13
+description Stadium Outdoor Middle Port
+
+interface 1/1/15,1/1/17
+description Stadium Outdoor North Port
+
+interface 1/1/19,1/1/21,1/1/23,1/1/25,1/1/29,1/1/31,1/1/33
+description PressBOX
+
+interface 1/1/26
+description HUDL CAMERA - VLAN100
+
+interface 1/1/32
+description AP Concessions
+
+interface 1/1/45
+description AP
+
+interface 1/1/48
+description Pressbox Camera
+
+interface 1/1/52
+description Uplink to MDF
+
+vsf split-detect mgm
+
+vsf secondary-member 2
+
