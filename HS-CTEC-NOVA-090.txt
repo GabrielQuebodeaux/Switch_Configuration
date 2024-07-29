@@ -1,0 +1,23 @@
+hostname HS-CTEC-NOVA-090
+
+interface vlan 1
+ip address 10.228.24.90/16
+exit
+
+ip route 0.0.0.0/0 10.228.0.1
+
+interface 1/1/1-1/1/48
+no shutdown
+no routing
+vlan trunk native 1
+vlan trunk allowed 1,40,100,200,240
+
+interface 1/1/52
+description UPLINK to .20
+no shutdown
+no routing
+vlan trunk native 1
+vlan trunk allowed 1,40,100,200,240,250
+dhcpv4-snooping trust
+
+

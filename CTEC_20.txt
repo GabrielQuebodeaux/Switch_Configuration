@@ -1,0 +1,488 @@
+
+#
+ version 5.20, Release 1809P10-US
+#
+ sysname HS_CTEC_215-020
+#
+ clock timezone "Mountain Time(US,Canada)" minus 07:00:00 
+ clock summer-time summer-time repeating 02:00:00 2000 March second Sunday 02:00:00 2000 November first Sunday  01:00:00
+#
+ undo copyright-info enable
+#
+ voice vlan mac-address 0004-f200-0000 mask ffff-ff00-0000
+ voice vlan mac-address 6416-7f00-0000 mask ffff-ff00-0000
+ voice vlan track lldp
+#
+ irf mac-address persistent timer
+ irf auto-update enable
+ undo irf link-delay
+#
+ domain default enable clearpass 
+#
+ telnet server acl 2000
+#
+ lldp compliance cdp
+#
+ shutdown-interval 300
+ loopback-detection enable
+ loopback-detection multi-port-mode enable
+ loopback-detection interval-time 5
+#
+ ip http acl 2000 
+#
+ password-recovery enable
+#
+acl number 2000 name Switch_Management
+ description Switch Management
+ rule 0 permit source 10.25.0.0 0.0.255.255 
+ rule 7 remark Graylog syslog
+ rule 7 permit source 10.24.7.0 0.0.0.255 
+ rule 25 remark Grafana syslog
+ rule 25 permit source 10.24.25.0 0.0.0.255 
+ rule 47 remark IMC Switch Management
+ rule 47 permit source 10.24.47.0 0.0.0.255 
+ rule 58 permit source 10.24.58.0 0.0.0.255 
+ rule 60 permit source 10.24.60.0 0.0.0.255 
+ rule 500 remark Global Protect Access
+ rule 600 remark VLAN 100 Networks
+ rule 700 remark VLAN 200 Networks
+#
+acl number 3300 name Restrict_Adtran_public
+ rule 0 permit ip destination 163.248.1.0 0.0.0.255 
+ rule 100 deny ip destination 192.168.0.0 0.0.0.255 
+ rule 200 deny ip destination 172.16.0.0 0.15.255.255 
+ rule 300 deny ip destination 10.0.0.0 0.255.255.255 
+ rule 400 deny ip destination 163.248.0.0 0.0.127.255 
+acl number 3500 name Restrict_Guest_network
+ rule 10 permit ip destination 10.25.0.0 0.0.255.255 
+ rule 30 remark LanSchool
+ rule 30 permit ip destination 10.24.30.0 0.0.0.255 
+ rule 58 remark ClearPass
+ rule 58 permit ip destination 10.24.58.0 0.0.0.255 
+ rule 59 remark InfoBlox
+ rule 59 permit ip destination 10.24.59.0 0.0.0.255 
+ rule 61 remark ContentKeeper
+ rule 61 permit ip destination 10.24.61.0 0.0.0.255 
+ rule 100 deny ip destination 192.168.0.0 0.0.255.255 
+ rule 200 deny ip destination 172.16.0.0 0.15.255.255 
+ rule 300 deny ip destination 10.0.0.0 0.255.255.255 
+ rule 400 deny ip destination 163.248.0.0 0.0.127.255 
+#
+igmp-snooping
+#
+vlan 1
+ igmp-snooping enable
+ igmp-snooping version 3
+#
+vlan 40
+#
+vlan 100
+#
+vlan 200
+#
+vlan 240
+#
+vlan 250
+#
+hwtacacs scheme tacacs
+ primary authentication 10.24.49.1 key cipher $c$3$o6aukcCyvs5VhIjuaf67HxAqFK1BRxGphc0UaFtfbM8zJhMVP5MQrEbynw==
+ primary authorization 10.24.49.1 key cipher $c$3$T4YOXq2dSUnkZRX4o+2g2BirYN8Zi/X7ANbUY4/R8qnxO9x0r4o9rflyAA==
+ primary accounting 10.24.49.1 key cipher $c$3$8cbNCx3qZ/T46sjL0klnrrG0BJ/L5z0kUj8GHS4KouXlxO83wZqErBROuQ==
+ user-name-format without-domain
+hwtacacs scheme clearpass
+ primary authentication 10.24.58.1 key cipher $c$3$csYZOJswVNGLVNelr0dd0dm/ZzogvvnpfUGsJwtSSs9n/a6FHvVQJ8K5OA==
+ secondary authentication 10.24.58.2 key cipher $c$3$UZlP3bt6rlTkwiGlVOnTyLpjuqtrcVTQ51rgygeFKAsh86oS5w9Zv+Pebg==
+ primary authorization 10.24.58.1 key cipher $c$3$xTFaFS93FFvFLDUYLezDU/5xIVw/XVKlRVEOpvsX1cEEq97MOPWC7xRYwA==
+ secondary authorization 10.24.58.2 key cipher $c$3$s3+6KcLsL0BH+iFQ95wIiJBGAqAdQ3myryi7EIXcE460A8/uLN/KFF3TVA==
+ primary accounting 10.24.58.1 key cipher $c$3$DHWgxL51SbmszQG+tNZl2oS4lPRrVSO77r5RaYNZvvdc5oq+rS7YBL/5hA==
+ secondary accounting 10.24.58.2 key cipher $c$3$9YYrin5AMMZ3s1YTtzTsuylgsCK42P+e3o1cEsF5dK+nWd7amZUcy5ur6g==
+ user-name-format without-domain
+#
+radius scheme system
+ server-type extended
+ primary authentication 127.0.0.1 1645
+ primary accounting 127.0.0.1 1646
+ user-name-format without-domain
+#
+domain canyonsdistrict 
+ authentication login hwtacacs-scheme tacacs local
+ authorization login hwtacacs-scheme tacacs local
+ accounting login hwtacacs-scheme tacacs local
+ authorization command hwtacacs-scheme tacacs local
+ accounting command hwtacacs-scheme tacacs
+ access-limit disable
+ state active 
+ idle-cut disable 
+ self-service-url disable 
+domain clearpass 
+ authentication login hwtacacs-scheme clearpass local
+ authorization login hwtacacs-scheme clearpass local
+ accounting login hwtacacs-scheme clearpass local
+ authorization command hwtacacs-scheme clearpass local
+ accounting command hwtacacs-scheme clearpass
+ access-limit disable
+ state active 
+ idle-cut disable 
+ self-service-url disable 
+domain system 
+ access-limit disable
+ state active 
+ idle-cut disable 
+ self-service-url disable 
+#
+user-group system
+ authorization-attribute level 3
+ group-attribute allow-guest
+#
+local-user cavemin
+ password cipher $c$3$D8i7JiXhL6U/0fnfyRPoLnbG84EBLpBELZNIW89GFUZK
+ authorization-attribute level 3
+ service-type ssh terminal
+ service-type web
+#
+interface NULL0
+#
+interface Vlan-interface1
+ ip address 10.228.24.20 255.255.0.0 
+#
+interface GigabitEthernet1/0/1
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/2
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/3
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/4
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/5
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/6
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/7
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/8
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/9
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/10
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/11
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/12
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/13
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/14
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/15
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/16
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/17
+ port link-mode bridge
+ port access vlan 250
+ poe enable
+#
+interface GigabitEthernet1/0/18
+ port link-mode bridge
+#
+interface GigabitEthernet1/0/19
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/20
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/21
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/22
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/23
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface GigabitEthernet1/0/24
+ port link-mode bridge
+ port link-type hybrid
+ port hybrid vlan 40 100 200 240 tagged
+ port hybrid vlan 1 untagged
+ loopback-detection enable
+ loopback-detection control enable
+ loopback-detection action shutdown
+ poe enable
+ qos trust dscp
+#
+interface Ten-GigabitEthernet1/0/25
+ port link-mode bridge
+ description UPLINK .105
+ port link-type trunk
+ port trunk permit vlan 1 40 100 200 240
+ speed 1000
+ duplex full
+#
+interface Ten-GigabitEthernet1/0/26
+ port link-mode bridge
+ description HS_CTEC_205D-001 1/0/3
+ port link-type trunk
+ port trunk permit vlan 1 40 70 100 200 240 250
+ qos trust dscp
+ dhcp-snooping trust
+#
+interface Ten-GigabitEthernet1/0/27
+ port link-mode bridge
+ description 10.228.24.90 1/0/52
+ port link-type trunk
+ port trunk permit vlan 1 40 100 200 240
+ qos trust dscp
+#
+interface Ten-GigabitEthernet1/0/28
+ port link-mode bridge
+ port link-type trunk
+ port trunk permit vlan 1 40 100 200 240
+ speed 1000
+ qos trust dscp
+#
+nqa entry imclinktopologypleaseignore ping
+ type icmp-echo
+  destination ip 10.228.255.254
+  frequency 270000
+#
+ dhcp-snooping
+#
+ ip route-static 0.0.0.0 0.0.0.0 10.228.0.1
+#
+ info-center loghost 10.24.47.1
+ info-center logbuffer size 1024
+#
+ snmp-agent
+ snmp-agent local-engineid 8000000B033CE5A67B04FF
+ snmp-agent sys-info contact CSD Helpdesk 801-826-5544
+ snmp-agent sys-info location Custodial Office, Rm 215
+ snmp-agent sys-info version v3
+ snmp-agent group v3 cavemin authentication write-view ViewDefault acl 2000
+ snmp-agent target-host trap address udp-domain 10.24.47.1 params securityname cavemin v3 privacy
+ snmp-agent usm-user v3 cavemin cavemin cipher authentication-mode sha $c$3$vzFL+41AKQGhrypHxbutPGUuaFFLRVr5cdLAt7tDFf+2wPFS5BQ= privacy-mode aes128 $c$3$HESvnpADg3B+HDwzHo9BQJvqJu5z7SC89VOzf1b7QL0yXQ== acl 2000
+#
+ header login %
+UNAUTHORIZED ACCESS TO THIS NETWORK DEVICE IS PROHIBITED.
+
+You must have explicit permission to access|                       DDD
+or configure this device.  All activity    |                       DDD
+performed on this device may be logged and |                       DDD
+is subject to audit.  Violation of this    | .CCCCCC .SSSSSS   .DDDDDD
+policy may result in disciplinary action   |CCCC"    SSS      DDD" DDD
+and may be reported to law enforcement     |CCC      "SSSSSS. DDD  DDD
+authorities.  There is no right to privacy |CCCC.         SSS DDDD DDD
+on this device.                            | "CCCCCC .SSSSSS'  "DDDDDD
+%
+#
+ nqa schedule imclinktopologypleaseignore ping start-time now lifetime 630720000 
+#
+ ntp-service source-interface Vlan-interface1
+ ntp-service unicast-server 10.25.10.250
+#
+ ssh server enable
+ sftp server enable
+ ssh server acl 2000
+#
+ ip https acl 2000 
+#
+ load xml-configuration 
+#
+ load tr069-configuration
+#
+user-interface aux 0
+ authentication-mode scheme
+user-interface vty 0 15
+ acl 2000 inbound
+ authentication-mode scheme
+ command authorization
+ command accounting
+ user privilege level 3
+ set authentication password cipher $c$3$ZEFw/3AKgaYYnfU0Ipzig2dvV+xcI0IZiBDDZQ==
+ protocol inbound ssh
+#
+return
